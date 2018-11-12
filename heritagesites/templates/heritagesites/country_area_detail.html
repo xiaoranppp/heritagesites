@@ -1,0 +1,71 @@
+{% extends 'heritagesites/base.html' %}
+{% block content %}
+{% if user.is_authenticated %}
+<h2>{{country.country_area_name | safe}}</h2>
+
+{% if country.m49_code  %}
+  <div class="row">
+    <div class="col-sm-2">
+      <p>m49 code</p>
+    </div>
+    <div class="col-sm-10">
+      {{ country.m49_code | safe }}
+    </div>
+  </div>
+{% endif %}
+
+
+{% if country.iso_alpha3_code  %}
+  <div class="row">
+    <div class="col-sm-2">
+      <p>iso alpha code</p>
+    </div>
+    <div class="col-sm-10">
+      {{ country.iso_alpha3_code | safe }}
+    </div>
+  </div>
+{% endif %}
+{% if country.dev_status  %}
+  <div class="row">
+    <div class="col-sm-2">
+      <p>development status</p>
+    </div>
+    <div class="col-sm-10">
+      {{ country.dev_status | safe }}
+    </div>
+  </div>
+{% endif %}
+{% if country.location.sub_region.sub_region_name %}
+  <div class="row">
+    <div class="col-sm-2">
+      <p>sub region</p>
+    </div>
+    <div class="col-sm-10">
+      {{ country.location.sub_region.sub_region_name | safe }}
+    </div>
+  </div>
+{% endif %}
+{% if country.location.intermediate_region.intermediate_region_name %}
+  <div class="row">
+    <div class="col-sm-2">
+      <p>intermediate region</p>
+    </div>
+    <div class="col-sm-10">
+      {{ country.location.intermediate_region.intermediate_region_name | safe }}
+    </div>
+  </div>
+{% endif %}
+{% if country.location.region.region_name %}
+  <div class="row">
+    <div class="col-sm-2">
+      <p>region</p>
+    </div>
+    <div class="col-sm-10">
+      {{ country.location.region.region_name | safe }}
+    </div>
+  </div>
+{% endif %}
+{% else %}
+<a href="{% url 'login' %}">Log in</a>
+{% endif %}
+{% endblock content %}}
