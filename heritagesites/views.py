@@ -5,9 +5,11 @@ from django.http import HttpResponse,HttpResponseRedirect
 from django.views import generic
 from .forms import HeritageSiteForm
 from .models import HeritageSite,CountryArea, HeritageSiteJurisdiction
+from .filters import HeritageSiteFilter
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.urls import reverse,reverse_lazy
+from django_filters.views import FilterView
 
 def index(request):
 	return HttpResponse("Hello, world. You're at the UNESCO Heritage Sites index page.")
@@ -74,7 +76,7 @@ class SiteCreateView(generic.View):
 			site.save()
 			for country in form.cleaned_data['country_area']:
 				HeritageSiteJurisdiction.objects.create(heritage_site=site, country_area=country)
-			return redirect(site.get_absolute_url()) # shortcut to object's get_absolute_url()
+			return redirect(site) # shortcut to object's get_absolute_url()
 			# return HttpResponseRedirect(site.get_absolute_url())
 		return render(request, 'heritagesites/site_new.html', {'form': form})
 
@@ -156,3 +158,6 @@ class SiteDeleteView(generic.DeleteView):
 		self.object.delete()
 
 		return HttpResponseRedirect(self.get_success_url())
+class SiteFilterView(FilterView):
+	filterset_class = HeritageSiteFilter
+	template_name = 'heritagesites/site_filter.html'

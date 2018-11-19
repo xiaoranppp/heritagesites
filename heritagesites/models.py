@@ -7,7 +7,7 @@
 # Feel free to rename the models, but don't rename db_table values or field names.
 from django.db import models
 from django.urls import reverse
-
+from django.db.models import Count, F, Value
 
 class CountryArea(models.Model):
     country_area_id = models.AutoField(primary_key=True)
@@ -98,6 +98,64 @@ class HeritageSite(models.Model):
         return self.site_name
     def get_absolute_url(self):
         return reverse('site_detail', kwargs={'pk': self.pk})
+    @property
+    def country_area_names(self):
+        countries = self.country_area.select_related('location').order_by('country_area_name')
+
+        names = []
+        for country in countries:
+            name = country.country_area_name
+            if name is None:
+                continue
+            iso_code = country.iso_alpha3_code
+
+            name_and_code = ''.join([name, ' (', iso_code, ')'])
+            if name_and_code not in names:
+                names.append(name_and_code)
+
+        return ', '.join(names)
+    @property
+    def region_names(self):
+		
+       # regions = self.country_area.select_related('location').order_by('location__region__region_name')
+        regions = self.country_area.select_related('location').values(name=F('location__region__region_name')).order_by('name')
+        names = []
+        for region in regions:
+            #name = region.location__region__region_name
+            name=region['name']
+            if name is None:
+                continue
+            
+            if name not in names:
+                names.append(name)
+        return ', '.join(names)
+    @property
+    def sub_region_names(self):
+       # sub_regions = self.country_area.select_related('location').order_by('location__sub_region__sub_region_name')
+        sub_regions = self.country_area.select_related('location').values(name=F('location__sub_region__sub_region_name')).order_by('name')
+        names = []
+        for sub_region in sub_regions:
+            name = sub_region['name']
+            if name is None:
+                continue
+            
+            if name not in names:
+                names.append(name)
+        return ', '.join(names)
+    @property
+    def intermediate_region_names(self):
+        #intermediate_regions = self.country_area.select_related('location').order_by('location__intermediate_region__intermediate_region_name')
+        intermediate_regions = self.country_area.select_related('location').values(name=F('location__intermediate_region__intermediate_region_name')).order_by('name')
+        names = []
+        for intermediate_region in intermediate_regions:
+            name = intermediate_region['name']
+            if name is None:
+                continue
+            
+            if name not in names:
+                names.append(name)
+        return ', '.join(names)
+
 
     def country_area_display(self):
         """Create a string for country_area. This is required to display in the Admin view."""
